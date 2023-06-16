@@ -2,14 +2,18 @@ import JWT from "jsonwebtoken";
 import config from "../../config";
 
 function generateToken(data) {
-    return JWT.sign(data, config.JWT_SECRET);
+    try {
+        return JWT.sign(data, config.JWT_SECRET);
+    } catch (error) {
+        throw new Error(error)
+    }
 }
 
 function verifyToken(token) {
     try {
         return JWT.verify(token, config.JWT_SECRET);
     } catch (error) {
-        return false;
+        throw new Error(error);
     }
 }
 
