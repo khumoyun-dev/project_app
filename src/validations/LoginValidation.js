@@ -1,7 +1,8 @@
 import Joi from "joi";
 
 export default Joi.object({
-    email: Joi.email()
+    email: Joi.string()
+        .email()
         .required()
         .error(Error('Invalid email')),
     password: Joi.string()

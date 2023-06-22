@@ -1,53 +1,83 @@
-import SignupValidation from '../validations/SignupValidation';
-import LoginValidation from '../validations/LoginValidation';
-import JWT from '../modules/jwt';
-import bcrypt from '../modules/bcrypt';
+import signupValidation from '../validations/signupValidation.js';
+import loginValidation from '../validations/loginValidation.js';
+import JWT from '../modules/jwt.js';
+import bcrypt from '../modules/bcrypt.js';
+import Users from "../models/userModel.js"
 
-async function signUp(req, res) {
-    try {
-        const data = await SignupValidation.validateAsync(req.body);
+class authController {
 
-        const existingUser = await req.postgres.users.findOne({ where: { email: data.email } });
-        if (existingUser) throw new Error('User already exists!');
+    static async signUp(req, res) {
+        try {
+            const data = await signupValidation.validateAsync(req.body);
 
-        const user = await req.postgres.users.create({
-            username: data.username,
-            email: data.email,
-            password: await bcrypt.generateHash(data.password),
-        });
+            const existingUser = await Users.findOne({ where: { email: data.email } });
+            if (existingUser) throw new Error('User already exists!');
 
-        console.log(user);
-
-        res.status(201).json({
-            ok: true,
-            message: 'Successfully signed up',
-            data: user,
-        });
-
-    } catch (error) {
-        res.status(400).json({
-            ok: false,
-            message: error + ''
-        });
-    }
-}
-
-async function login(req, res) {
-    try {
-        const data = await LoginValidation.validateAsync(req.body);
-
-        const user = await req.postgres.users.findOne({
-            where: {
+            const user = await Users.create({
+                username: data.username,
                 email: data.email,
-            }
-        });
+                password: await bcrypt.generateHash(data.password),
+            });
 
-        if (!user) throw new Error('User not found, try to Sign up');
+            console.log(user);
 
-        let checkPass = await bcrypt.verifyHash(data.password, user.password);
-        if (!checkPass) throw new Error('Incorrect password!');
+            const token = JWT.generateToken({
+                id: user.id,
+                isBlocked: user.isBlocked,
+                role: user.role
+            });
 
-    } catch (error) {
+            res.status(201).json({
+                ok: true,
+                message: 'Successfully signed up',
+                data: { user, token },
+            });
 
+        } catch (error) {
+            res.status(400).json({
+                ok: false,
+                message: error + ''
+            });
+        }
+    }
+
+    static async login(req, res) {
+        try {
+            const data = await loginValidation.validateAsync(req.body);
+
+            const user = await Users.findOne({
+                where: {
+                    email: data.email,
+                }
+            });
+
+            if (!user) throw new Error('User not found, try to Sign up');
+
+            if (user.isBlocked) throw new Error('You are blocked!');
+
+            let checkPass = await bcrypt.verifyHash(data.password, user.password);
+            if (!checkPass) throw new Error('Incorrect password!');
+
+            const token = JWT.generateToken({
+                id: user.id,
+                isBlocked: user.isBlocked,
+                role: user.role
+            });
+
+            // res.cookie("token", token, { httpOnly: true });
+
+            res.status(201).json({
+                ok: true,
+                message: 'Successfully logged in!',
+                data: { token },
+            })
+        } catch (error) {
+            res.status(400).json({
+                ok: false,
+                message: error + "",
+            });
+        }
     }
 }
+
+export default authController;

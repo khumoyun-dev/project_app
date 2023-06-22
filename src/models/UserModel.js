@@ -3,32 +3,33 @@ export default async (Sequelize, sequelize) => {
         'users',
         {
             id: {
-                type: Sequelize.Datatypes.UUID,
+                type: Sequelize.DataTypes.UUID,
                 defaultValue: Sequelize.UUIDV4(),
                 primaryKey: true,
                 allowNull: false,
             },
             username: {
-                type: Sequelize.Datatypes.STRING(32),
+                type: Sequelize.DataTypes.STRING,
                 unique: true,
                 allowNull: false,
             },
             email: {
-                type: Sequelize.Datatypes.STRING(64),
+                type: Sequelize.DataTypes.STRING,
                 unique: true,
                 allowNull: false,
             },
             password: {
-                type: Sequelize.Datatypes.STRING
+                type: Sequelize.DataTypes.STRING,
+                allowNull: false,
             },
             role: {
-                type: Sequelize.Datatypes.ENUM,
-                values: ['admin', 'user', 'visitor'],
+                type: Sequelize.DataTypes.ENUM,
+                values: ['admin', 'user'],
                 allowNull: false,
-                defaultValue: 'visitor',
+                defaultValue: 'user',
             },
-            blocked: {
-                type: Sequelize.Datatypes.BOOLEAN,
+            isBlocked: {
+                type: Sequelize.DataTypes.BOOLEAN,
                 allowNull: false,
                 defaultValue: false
             }

@@ -1,5 +1,5 @@
 import JWT from "jsonwebtoken";
-import config from "../../config";
+import config from "../../config.js";
 
 function generateToken(data) {
     try {

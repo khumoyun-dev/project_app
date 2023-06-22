@@ -3,18 +3,15 @@ import JWT from "../modules/jwt.js";
 export default async (req, res, next) => {
     try {
         const token = req.headers['authorization'];
+        if (!token) throw new Error('Token not found!');
+
         const data = JWT.verifyToken(token);
-        const userRole = data.role;
 
-        if (userRole !== 'admin') {
-            throw new Error('No access, only admins!');
-        }
-
-        req.isAdmin = userRole == "admin";
+        req.user = data.id;
 
         next();
     } catch (error) {
-        res.status(401).json({
+        res.status(403).json({
             ok: false,
             message: error + ''
         });

@@ -5,8 +5,8 @@ const generateHash = async function (word) {
     return bcrypt.hash(word, salt);
 }
 
-const verifyHash = function (word, crypt) {
-    return bcrypt.compareSync(word, crypt);
+const verifyHash = async function (word, crypt) {
+    return await bcrypt.compare(word, crypt);
 }
 
 export default { generateHash, verifyHash }

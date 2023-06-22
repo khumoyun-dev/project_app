@@ -1,6 +1,6 @@
 export default async (Sequelize, sequelize) => {
     return await sequelize.define(
-        'items',
+        'tags',
         {
             id: {
                 type: Sequelize.DataTypes.UUID,
@@ -8,16 +8,9 @@ export default async (Sequelize, sequelize) => {
                 primaryKey: true,
                 allowNull: false,
             },
-            name: {
+            label: {
                 type: Sequelize.DataTypes.STRING,
-                allowNull: false
-            },
-            image: {
-                type: Sequelize.DataTypes.STRING,
-            },
-            likes: {
-                type: Sequelize.DataTypes.ARRAY(Sequelize.DataTypes.UUID),
-                defaultValue: [],
+                allowNull: false,
             }
         }
     )

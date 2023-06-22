@@ -1,13 +1,18 @@
 import { Sequelize } from "sequelize";
-import config from "../../config";
+import config from "../../config.js";
 
-import UserModel from "../models/UserModel";
-import CollectionModel from "../models/CollectionModel";
-import ItemModel from "../models/ItemModel";
-import CommentModel from "../models/CommentModel";
+import userModel from "../models/userModel.js";
+import collectionModel from "../models/collectionModel.js";
+import itemModel from "../models/itemModel.js";
+import commentModel from "../models/commentModel.js";
+import tagModel from "../models/tagModel.js";
 
-const sequelize = new Sequelize(config.PG_CONNECTION_STRING, {
+
+
+const sequelize = new Sequelize(config.DB_NAME, config.DB_USERNAME, config.DB_PASSWORD, {
     logging: false,
+    host: 'localhost',
+    dialect: 'postgres',
 });
 
 async function postgres() {
@@ -15,39 +20,30 @@ async function postgres() {
         await sequelize.authenticate();
         console.log("Connection to db has been established successfully!");
 
-        let db = {};
+        const User = await userModel(Sequelize, sequelize);
+        const Collection = await collectionModel(Sequelize, sequelize);
+        const Item = await itemModel(Sequelize, sequelize);
+        const Comment = await commentModel(Sequelize, sequelize);
+        const Tag = await tagModel(Sequelize, sequelize);
 
-        db.users = await UserModel(Sequelize,sequelize);
-        db.collections = await CollectionModel(Sequelize,sequelize);
-        db.items = await ItemModel(Sequelize, sequelize);
-        db.comments = await CommentModel(Sequelize, sequelize);
+        User.hasMany(Collection, { foreignKey: 'ownerId' });
+        User.hasMany(Item, { foreignKey: 'ownerId' });
+        User.hasMany(Comment, { foreignKey: 'authorId' });
 
-        await db.users.hasMany(db.collections, {
-            foreignKey: 'user_id',
-        });
+        Collection.belongsTo(User, { foreignKey: 'ownerId' });
+        Collection.hasMany(Item, { foreignKey: 'collectionId' });
 
-        await db.collections.belongsTo(db.users, {
-            foreignKey: 'user_id',
-        });
+        Item.belongsTo(Collection, { foreignKey: 'collectionId' });
+        Item.belongsTo(User, { foreignKey: 'ownerId' });
+        Item.belongsToMany(User, { through: 'ItemLikes', foreignKey: 'itemId', as: 'likedBy' });
 
-        await db.collections.hasMany(db.items, {
-            foreignKey: 'collection_id',
-        });
+        Comment.belongsTo(Item, { foreignKey: 'itemId' });
+        Comment.belongsTo(User, { foreignKey: 'authorId' });
 
-        await db.items.belongsTo(db.collections, {
-            foreignKey: 'collection_id',
-        });
-
-        await db.items.hasMany(db.comments, {
-            foreignKey: 'item_id',
-        });
-
-        await db.comments.belongsTo(db.items, {
-            foreignKey: 'item_id'
-        });
+        Tag.belongsToMany(Item, { through: 'ItemTags', as: 'items' });
 
         await sequelize.sync({ force: false });
-        return db;
+        // return db;
     } catch (error) {
         console.error("Unable to connect to the database", error);
     }

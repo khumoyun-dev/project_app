@@ -10,10 +10,7 @@ export default async (Sequelize, sequelize) => {
             },
             text: {
                 type: Sequelize.DataTypes.TEXT,
-            },
-            likedBy: {
-                type: Sequelize.DataTypes.ARRAY(Sequelize.DataTypes.UUID),
-                defaultValue: [],
+                allowNull: false,
             },
         }
     )

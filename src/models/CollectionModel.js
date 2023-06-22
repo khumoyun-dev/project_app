@@ -8,10 +8,25 @@ export default async (Sequelize, sequelize) => {
                 primaryKey: true,
                 allowNull: false,        
             },
-            name: {
+            title: {
                 type: Sequelize.DataTypes.STRING,
                 allowNull: false,
             },
+            description: {
+                type: Sequelize.DataTypes.STRING,
+            },
+            theme: {
+                type: Sequelize.DataTypes.STRING,
+                allowNull: false,
+            },
+            image: {
+                type: Sequelize.DataTypes.STRING,
+            },
+            item_quantity: {
+                type: Sequelize.DataTypes.INTEGER,
+                allowNull: false,
+                defaultValue: 0,
+            }
         }
     )
 }
