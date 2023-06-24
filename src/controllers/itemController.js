@@ -8,6 +8,9 @@ class itemController {
             const data = await itemValidation.validateAsync(req.body);
             const ownerId = req.user;
 
+            const isExist = await Item.findOne({ where: { name: data.name, ownerId } });
+            if(isExist) throw new Error("Item already exists!");
+
             const item = await Item.create({
                 ...data,
                 ownerId
