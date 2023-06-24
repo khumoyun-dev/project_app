@@ -3,7 +3,7 @@ import config from "../../config.js";
 
 function generateToken(data) {
     try {
-        return JWT.sign(data, config.JWT_SECRET);
+        return JWT.sign(data, config.JWT_SECRET, { expiresIn: '12h' });
     } catch (error) {
         throw new Error(error)
     }

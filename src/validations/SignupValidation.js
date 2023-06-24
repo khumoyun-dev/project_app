@@ -11,7 +11,7 @@ export default Joi.object({
               .required()
               .error(Error('Invalid email')),
        password: Joi.string()
-              .pattern(new RegExp('^[a-zA-Z0-9]{6,20}$'))
+              .pattern(new RegExp('^[a-zA-Z0-9@#$&]{6,20}$'))
               .required()
               .error(Error('Invalid password')),
 });

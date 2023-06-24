@@ -3,27 +3,21 @@ import cors from 'cors';
 
 import authRouter from './src/routers/authRouter.js'
 import userRouter from './src/routers/userRouter.js'
-import testRouter from './src/routers/testRouter.js';
-import postgres from './src/modules/postges.js';
+import collectionRouter from './src/routers/collectionRouter.js';
+import { postgres } from './src/modules/postges.js';
+import itemRouter from './src/routers/itemRouter.js';
+import commentRouter from './src/routers/commentRouter.js';
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors);
+app.use(cors());
 
-// app.use("/auth", authRouter);
-// app.use("/users", userRouter);
-
-// app.use('/', testRouter);
-
-app.use((err, req, res, next) => {
-    // Log the error
-    console.error(err);
-
-    // Send the error response
-    res.send(`${err}`);
-    next();
-});
+app.use("/auth", authRouter);
+app.use("/users", userRouter);
+app.use("/collections", collectionRouter);
+app.use("/items", itemRouter);
+app.use("/comments", commentRouter);
 
 // app.use(async (req, res, next) => {
 //     req.postgres = db;
@@ -31,7 +25,7 @@ app.use((err, req, res, next) => {
 // });
 
 
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 3000;
 const start = async () => {
     try {
         await postgres();

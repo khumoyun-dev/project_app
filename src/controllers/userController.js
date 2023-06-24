@@ -1,9 +1,11 @@
-import Users from "../models/userModel.js";
+import { User } from "../modules/postges.js";
+import userValidation from '../validations/userValidation.js'
 
 class userController {
+
     static async getUsers(req, res) {
         try {
-            const users = await Users.findAll({ order: [["createdAt", "DESC"]] });
+            const users = await User.findAll({ order: [["createdAt", "DESC"]] });
 
             res.status(200).json({
                 ok: true,
@@ -21,7 +23,8 @@ class userController {
     static async getUserById(req, res) {
         try {
             const userId = req.params.id;
-            const user = await Users.findOne({ where: { id: userId } });
+            const user = await User.findOne({ where: { id: userId } });
+            if (!user) throw new Error("User not found!");
 
             res.status(200).json({
                 ok: true,
@@ -40,12 +43,12 @@ class userController {
     static async deleteUser(req, res) {
         try {
             const userId = req.params.id;
-            await handleUserDelete(userId);
-            const deletedUser = await Users.destroy({ where: { id: userId } });
+            // await handleUserDelete(userId);
+            const deletedUser = await User.destroy({ where: { id: userId } });
+            if (!deletedUser) throw new Error("User not found!");
 
             res.status(200).json({
                 ok: true,
-                data: deletedUser,
             });
 
         } catch (error) {
@@ -58,11 +61,12 @@ class userController {
 
     static async updateUser(req, res) {
         try {
+            const data = await userValidation.validateAsync(req.body);
             const userId = req.params.id;
-            const updatedUser = await Users.update(req.body, { where: { id: userId } }, { returning: true });
-            if (updatedUser) {
-                await handleUserUpdate(userId, updatedUser.username, updatedUser.avatar);
-            }
+            const updatedUser = await User.update({ ...data }, { where: { id: userId }, returning: true });
+            // if (updatedUser) {
+            //     await handleUserUpdate(userId, updatedUser.username, updatedUser.avatar);
+            // }
 
             res.status(200).json({
                 ok: true,

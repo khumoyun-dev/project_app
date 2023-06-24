@@ -2,7 +2,9 @@ import signupValidation from '../validations/signupValidation.js';
 import loginValidation from '../validations/loginValidation.js';
 import JWT from '../modules/jwt.js';
 import bcrypt from '../modules/bcrypt.js';
-import Users from "../models/userModel.js"
+
+import { User } from '../modules/postges.js';
+
 
 class authController {
 
@@ -10,16 +12,14 @@ class authController {
         try {
             const data = await signupValidation.validateAsync(req.body);
 
-            const existingUser = await Users.findOne({ where: { email: data.email } });
+            const existingUser = await User.findOne({ where: { email: data.email } });
             if (existingUser) throw new Error('User already exists!');
 
-            const user = await Users.create({
+            const user = await User.create({
                 username: data.username,
                 email: data.email,
                 password: await bcrypt.generateHash(data.password),
             });
-
-            console.log(user);
 
             const token = JWT.generateToken({
                 id: user.id,
@@ -45,7 +45,7 @@ class authController {
         try {
             const data = await loginValidation.validateAsync(req.body);
 
-            const user = await Users.findOne({
+            const user = await User.findOne({
                 where: {
                     email: data.email,
                 }
