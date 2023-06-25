@@ -10,6 +10,10 @@ collectionRouter.get("/", authMiddleware, collectionController.getCollections);
 collectionRouter.get("/user/:userId", authMiddleware, collectionController.getCollectionsByUserId);
 collectionRouter.get("/:collectionId", authMiddleware, collectionController.getCollectionById);
 
+collectionRouter.put("/:collectionId", authMiddleware, collectionController.updateCollection);
+
+collectionRouter.delete("/:collectionId", authMiddleware, collectionController.deleteCollection);
+
 collectionRouter.post("/", authMiddleware, collectionController.createCollection);
 
 export default collectionRouter;

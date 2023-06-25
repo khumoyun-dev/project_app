@@ -19,11 +19,6 @@ app.use("/collections", collectionRouter);
 app.use("/items", itemRouter);
 app.use("/comments", commentRouter);
 
-// app.use(async (req, res, next) => {
-//     req.postgres = db;
-//     next();
-// });
-
 
 const PORT = process.env.PORT || 3000;
 const start = async () => {
