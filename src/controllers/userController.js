@@ -5,7 +5,7 @@ class userController {
 
     static async getUsers(req, res) {
         try {
-            const users = await User.findAll({ order: [["createdAt", "DESC"]] });
+            const users = await User.findAll({ order: [["createdAt", "DESC"]], attributes: { exclude: ['password'] } });
 
             res.status(200).json({
                 ok: true,
@@ -23,7 +23,7 @@ class userController {
     static async getUserById(req, res) {
         try {
             const userId = req.params.id;
-            const user = await User.findOne({ where: { id: userId } });
+            const user = await User.findOne({ where: { id: userId }, attributes: { exclude: ['password'] }, });
             if (!user) throw new Error("User not found!");
 
             res.status(200).json({
